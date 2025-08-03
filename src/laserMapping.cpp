@@ -342,6 +342,14 @@ void imu_cbk(const sensor_msgs::msg::Imu::SharedPtr msg_in) {
     msg->header.stamp = get_ros_time(get_time_sec(msg_in->header.stamp) - time_lag_imu_to_lidar);
     double timestamp = get_time_sec(msg->header.stamp);
 
+    double now = get_time_sec(rclcpp::Clock().now());
+
+    double lag = now - timestamp;
+
+    if (lag > 0.5) {
+        RCLCPP_WARN(logger, "⚠️ IMU message lag detected: %.3f seconds", lag);
+    }
+
     mtx_buffer.lock();
 
     if (timestamp < last_timestamp_imu) {
@@ -780,7 +788,7 @@ int main(int argc, char **argv) {
     // } else {
     sub_pcl = nh->create_subscription<sensor_msgs::msg::PointCloud2>(lid_topic, rclcpp::SensorDataQoS(), standard_pcl_cbk);
     // }
-    auto sub_imu = nh->create_subscription<sensor_msgs::msg::Imu>(imu_topic, 200000, imu_cbk);
+    auto sub_imu = nh->create_subscription<sensor_msgs::msg::Imu>(imu_topic, 100, imu_cbk);
 
     rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr pubLaserCloudFullRes;
     rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr pubLaserCloudFullRes_body;
