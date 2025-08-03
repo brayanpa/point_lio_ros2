@@ -782,7 +782,7 @@ int main(int argc, char **argv) {
 
     /*** ROS subscribe initialization ***/
     rclcpp::Subscription<sensor_msgs::msg::PointCloud2>::SharedPtr sub_pcl;
-    rclcpp::QoS qos_imu(100);
+    rclcpp::QoS qos_imu(200000);
     qos_imu.best_effort();
     sub_pcl = nh->create_subscription<sensor_msgs::msg::PointCloud2>(lid_topic, rclcpp::SensorDataQoS(), standard_pcl_cbk);
 
